@@ -1,9 +1,12 @@
 package com.rbhatt.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
+import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
+
+@Document(collection = "messages")
 public class Message {
   @Id
   String id;
@@ -23,6 +26,16 @@ public class Message {
 
   public String getId() {
     return id;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    return reflectionEquals(this, o);
+  }
+
+  @Override
+  public int hashCode() {
+    return reflectionHashCode(this);
   }
 }
 
