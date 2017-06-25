@@ -1,31 +1,27 @@
 package com.rbhatt.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import java.io.Serializable;
 
 import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
 
-@Document(collection = "messages")
-public class Message {
-  @Id
+public class Identifier implements Serializable {
   String id;
-  String data;
 
-  private Message() {
+  public Identifier() {
   }
 
-  public Message(String id, String data) {
+  public Identifier(String id) {
     this.id = id;
-    this.data = data;
-  }
-
-  public String getData() {
-    return data;
   }
 
   public String getId() {
     return id;
+  }
+
+  @Override
+  public String toString() {
+    return id.toString();
   }
 
   @Override
@@ -38,4 +34,3 @@ public class Message {
     return reflectionHashCode(this);
   }
 }
-

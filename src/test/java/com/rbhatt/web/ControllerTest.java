@@ -1,9 +1,12 @@
 package com.rbhatt.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rbhatt.model.ErrorMessage;
-import com.rbhatt.model.Message;
+import com.rbhatt.domain.command.CreateMessageCommand;
+import com.rbhatt.model.IdGenerator;
+import com.rbhatt.model.Identifier;
+import com.rbhatt.model.MessageView;
 import com.rbhatt.repository.MessageRepository;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,7 +15,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static com.rbhatt.web.Controller.MESSAGE_NOT_PRESENT;
+import java.util.UUID;
+
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -26,8 +31,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 public class ControllerTest {
 
   @Mock
+  IdGenerator idGenerator;
+  @Mock
   private MessageRepository messages;
-
+  @Mock
+  private CommandGateway gateway;
   private MockMvc mockMvc;
   private ObjectMapper objectMapper;
 
@@ -36,7 +44,7 @@ public class ControllerTest {
   public void setUp() throws Exception {
     objectMapper = new ObjectMapper();
     MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter(objectMapper);
-    mockMvc = standaloneSetup(new Controller(messages))
+    mockMvc = standaloneSetup(new Controller(gateway, messages, idGenerator))
       .setMessageConverters(mappingJackson2HttpMessageConverter)
       .build();
   }
@@ -44,7 +52,7 @@ public class ControllerTest {
   @Test
   public void shouldReturnMessage() throws Exception {
     String id = "12345";
-    Message expectedMessage = new Message(id, "hello world!");
+    MessageView expectedMessage = new MessageView(id, "hello world");
 
     when(messages.findOne(id)).thenReturn(expectedMessage);
 
@@ -55,27 +63,28 @@ public class ControllerTest {
 
   @Test
   public void shouldCreateMessage() throws Exception {
-    String id = "12345";
-    Message expectedMessage = new Message(id, "hello world!");
+    Request request = new Request("hello world!");
+    String id = UUID.randomUUID().toString();
+    Identifier identifier = new Identifier(id);
 
-    when(messages.save(expectedMessage)).thenReturn(expectedMessage);
+    when(idGenerator.generate()).thenReturn(identifier);
 
     mockMvc.perform(post("/messages/add")
-      .content(objectMapper.writeValueAsString(expectedMessage))
+      .content(objectMapper.writeValueAsString(request))
       .contentType(APPLICATION_JSON))
       .andExpect(status().isAccepted())
-      .andExpect(content().json(objectMapper.writeValueAsString(expectedMessage)));
+      .andExpect(content().json(objectMapper.writeValueAsString(identifier)));
+
+    verify(gateway).send(new CreateMessageCommand(identifier, request.getData()));
   }
 
   @Test
   public void shouldReturnNotFoundIfMessageNotPresent() throws Exception {
     String id = "12345";
-    ErrorMessage expectedError = new ErrorMessage(id, MESSAGE_NOT_PRESENT);
 
     when(messages.findOne(id)).thenReturn(null);
 
     mockMvc.perform(get("/messages/" + id).accept(APPLICATION_JSON))
-      .andExpect(status().isNotFound())
-      .andExpect(content().json(objectMapper.writeValueAsString(expectedError)));
+      .andExpect(status().isNotFound());
   }
 }

@@ -1,10 +1,12 @@
 package com.rbhatt.web;
 
-import com.rbhatt.model.ErrorMessage;
-import com.rbhatt.model.Message;
+import com.rbhatt.domain.command.CreateMessageCommand;
+import com.rbhatt.model.IdGenerator;
+import com.rbhatt.model.Identifier;
+import com.rbhatt.model.MessageView;
 import com.rbhatt.repository.MessageRepository;
+import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,35 +15,34 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/messages")
 class Controller {
 
-  static final String MESSAGE_NOT_PRESENT = "Message not present.";
-  static final String COULD_NOT_SAVE_MESSAGE = "Could not save message";
+  private CommandGateway gateway;
   private MessageRepository messages;
+  private IdGenerator idGenerator;
 
   @Autowired
-  Controller(MessageRepository messages) {
+  Controller(CommandGateway gateway, MessageRepository messages, IdGenerator idGenerator) {
+    this.gateway = gateway;
     this.messages = messages;
+    this.idGenerator = idGenerator;
   }
 
   @RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity getMessage(@PathVariable("id") String id) {
-    Message message = messages.findOne(id);
+    MessageView messageView = messages.findOne(id);
 
-    if (message == null) {
-      return new ResponseEntity(new ErrorMessage(id, MESSAGE_NOT_PRESENT), HttpStatus.NOT_FOUND);
+    if (messageView == null) {
+      return ResponseEntity.notFound().build();
     } else {
-      return ResponseEntity.ok(message);
+      return ResponseEntity.ok(messageView);
     }
   }
 
   @RequestMapping(value = "/add", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ResponseEntity createMessage(@RequestBody Message message) {
+  public ResponseEntity createMessage(@RequestBody Request request) {
+    Identifier identifier = idGenerator.generate();
 
-    Message savedMessage = messages.save(message);
+    gateway.send(new CreateMessageCommand(identifier, request.getData()));
 
-    if (message == null) {
-      return new ResponseEntity(new ErrorMessage(COULD_NOT_SAVE_MESSAGE), HttpStatus.INTERNAL_SERVER_ERROR);
-    } else {
-      return ResponseEntity.accepted().body(savedMessage);
-    }
+    return ResponseEntity.accepted().body(identifier);
   }
 }
