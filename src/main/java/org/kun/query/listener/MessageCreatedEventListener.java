@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-class MessageCreatedEventListener {
+public class MessageCreatedEventListener {
 
   private MessageRepository messages;
 
   @Autowired
-  MessageCreatedEventListener(MessageRepository messages) {
+  public MessageCreatedEventListener(MessageRepository messages) {
     this.messages = messages;
   }
 

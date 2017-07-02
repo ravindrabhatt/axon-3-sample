@@ -1,16 +1,15 @@
 package org.kun.domain;
 
-import org.kun.domain.command.CreateMessageCommand;
-import org.kun.domain.event.MessageCreatedEvent;
 import org.axonframework.commandhandling.CommandHandler;
 import org.axonframework.commandhandling.model.AggregateIdentifier;
+import org.axonframework.commandhandling.model.AggregateRoot;
 import org.axonframework.eventsourcing.EventSourcingHandler;
-import org.axonframework.spring.stereotype.Aggregate;
+import org.kun.domain.command.CreateMessageCommand;
+import org.kun.domain.event.MessageCreatedEvent;
 
 import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
 
-
-@Aggregate
+@AggregateRoot
 public class Message {
   @AggregateIdentifier
   private String id;

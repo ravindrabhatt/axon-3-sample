@@ -3,20 +3,27 @@ package org.kun.config;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
-import org.kun.domain.Message;
+import org.axonframework.commandhandling.AggregateAnnotationCommandHandler;
+import org.axonframework.commandhandling.CommandBus;
 import org.axonframework.commandhandling.SimpleCommandBus;
+import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.axonframework.commandhandling.gateway.DefaultCommandGateway;
 import org.axonframework.commandhandling.model.Repository;
-import org.axonframework.eventhandling.EventBus;
+import org.axonframework.eventhandling.*;
+import org.axonframework.eventsourcing.EventSourcingRepository;
+import org.axonframework.eventsourcing.eventstore.EmbeddedEventStore;
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
-import org.axonframework.messaging.interceptors.BeanValidationInterceptor;
+import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.axonframework.mongo.eventsourcing.eventstore.DefaultMongoTemplate;
 import org.axonframework.mongo.eventsourcing.eventstore.MongoEventStorageEngine;
 import org.axonframework.mongo.eventsourcing.eventstore.MongoTemplate;
 import org.axonframework.mongo.eventsourcing.eventstore.documentperevent.DocumentPerEventStorageStrategy;
 import org.axonframework.serialization.json.JacksonSerializer;
-import org.axonframework.spring.config.AxonConfiguration;
+import org.axonframework.spring.config.CommandHandlerSubscriber;
+import org.kun.domain.Message;
+import org.kun.query.listener.MessageCreatedEventListener;
+import org.kun.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +34,8 @@ import static java.util.Collections.singletonList;
 @Configuration
 @PropertySource("classpath:application.properties")
 public class AxonConfig {
+  @Autowired
+  MessageCreatedEventListener messageCreatedEventListener;
   @Value("${mongo.host.name}")
   private String mongoHost;
   @Value("${mongo.host.port}")
@@ -42,20 +51,45 @@ public class AxonConfig {
   @Value("${axon.application.snapshotCollectionName}")
   private String snapshotCollectionName;
 
-  @Autowired
-  private AxonConfiguration axonConfiguration;
-
-  @Autowired
-  private EventBus eventBus;
-
   @Bean
-  public Repository<Message> messages() {
-    return axonConfiguration.repository(Message.class);
+  public EventProcessor messagesEventProcessor(EventStore eventStore) {
+    SubscribingEventProcessor eventProcessor = new SubscribingEventProcessor("companiesEventProcessor",
+      new SimpleEventHandlerInvoker(messageCreatedEventListener), eventStore);
+
+    eventProcessor.start();
+
+    return eventProcessor;
   }
 
-  @Autowired
-  public void configure(@Qualifier("localSegment") SimpleCommandBus simpleCommandBus) {
-    simpleCommandBus.registerDispatchInterceptor(new BeanValidationInterceptor<>());
+  @Bean
+  public CommandHandlerSubscriber commandHandlerSubscriber() {
+    return new CommandHandlerSubscriber();
+  }
+
+  @Bean
+  public CommandBus commandBus() {
+    return new SimpleCommandBus();
+  }
+
+  @Bean
+  public CommandGateway commandGateway(CommandBus commandBus) {
+    return new DefaultCommandGateway(commandBus);
+  }
+
+  @Bean
+  public EventBus eventBus() {
+    return new SimpleEventBus();
+  }
+
+  @Bean
+  public EventStore eventStore(EventStorageEngine eventStorageEngine, MessageRepository messageRepository) {
+    return new EmbeddedEventStore(eventStorageEngine);
+  }
+
+  @Bean
+  public Repository<Message> messages(EventStore eventStore) {
+    EventSourcingRepository<Message> messageEventSourcingRepository = new EventSourcingRepository<>(Message.class, eventStore);
+    return messageEventSourcingRepository;
   }
 
   @Bean
@@ -75,8 +109,13 @@ public class AxonConfig {
   }
 
   @Bean
-  public EventStorageEngine eventStore(MongoTemplate axonMongoTemplate) {
+  public EventStorageEngine eventStorageEngine(MongoTemplate axonMongoTemplate) {
     return new MongoEventStorageEngine(
       axonJsonSerializer(), null, axonMongoTemplate(), new DocumentPerEventStorageStrategy());
+  }
+
+  @Bean
+  public AggregateAnnotationCommandHandler<Message> messageCommandHandler(EventStore eventStore) {
+    return new AggregateAnnotationCommandHandler<>(Message.class, messages(eventStore));
   }
 }
