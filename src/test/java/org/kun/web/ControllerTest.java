@@ -1,15 +1,15 @@
 package org.kun.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.axonframework.commandhandling.gateway.CommandGateway;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.kun.domain.command.CreateMessageCommand;
 import org.kun.model.IdGenerator;
 import org.kun.model.Identifier;
 import org.kun.model.MessageView;
 import org.kun.repository.MessageRepository;
-import org.axonframework.commandhandling.gateway.CommandGateway;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;

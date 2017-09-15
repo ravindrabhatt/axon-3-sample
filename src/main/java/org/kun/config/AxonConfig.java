@@ -9,7 +9,6 @@ import org.axonframework.commandhandling.SimpleCommandBus;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.axonframework.commandhandling.gateway.DefaultCommandGateway;
 import org.axonframework.commandhandling.model.Repository;
-import org.axonframework.eventhandling.*;
 import org.axonframework.eventsourcing.EventSourcingRepository;
 import org.axonframework.eventsourcing.eventstore.EmbeddedEventStore;
 import org.axonframework.eventsourcing.eventstore.EventStorageEngine;
@@ -52,16 +51,6 @@ public class AxonConfig {
   private String snapshotCollectionName;
 
   @Bean
-  public EventProcessor messagesEventProcessor(EventStore eventStore) {
-    SubscribingEventProcessor eventProcessor = new SubscribingEventProcessor("companiesEventProcessor",
-      new SimpleEventHandlerInvoker(messageCreatedEventListener), eventStore);
-
-    eventProcessor.start();
-
-    return eventProcessor;
-  }
-
-  @Bean
   public CommandHandlerSubscriber commandHandlerSubscriber() {
     return new CommandHandlerSubscriber();
   }
@@ -76,10 +65,6 @@ public class AxonConfig {
     return new DefaultCommandGateway(commandBus);
   }
 
-  @Bean
-  public EventBus eventBus() {
-    return new SimpleEventBus();
-  }
 
   @Bean
   public EventStore eventStore(EventStorageEngine eventStorageEngine, MessageRepository messageRepository) {
