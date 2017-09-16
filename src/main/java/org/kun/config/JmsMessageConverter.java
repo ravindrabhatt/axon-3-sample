@@ -29,8 +29,10 @@ public class JmsMessageConverter implements MessageConverter {
     try {
       GenericDomainEventMessage event = (GenericDomainEventMessage) ((GenericMessage) o).getPayload();
       activeMQTextMessage.setText(objectMapper.writeValueAsString(event.getPayload()));
+
       activeMQTextMessage.setJMSMessageID(event.getAggregateIdentifier());
       activeMQTextMessage.setJMSType(event.getPayloadType().getName());
+
       new SimpleJmsHeaderMapper().fromHeaders(message.getHeaders(), activeMQTextMessage);
 
     } catch (JsonProcessingException e) {
@@ -46,7 +48,7 @@ public class JmsMessageConverter implements MessageConverter {
     try {
       domainEventMessage = objectMapper.readValue(activeMQTextMessage.getText(), Class.forName(activeMQTextMessage.getJMSType()));
     } catch (Exception e) {
-
+      e.printStackTrace();
     }
     return domainEventMessage;
   }

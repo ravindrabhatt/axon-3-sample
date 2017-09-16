@@ -19,11 +19,11 @@ public class QueryMessagingConfiguration {
   public IntegrationFlow integrationFlow(ActiveMQConnectionFactory connectionFactory,
                                          @Qualifier(value = QUERY_CHANNEL) MessageChannel messageChannel,
                                          JmsMessageConverter jmsMessageConverter) {
-    return IntegrationFlows.from(Jms
-      .messageDrivenChannelAdapter(connectionFactory)
-      .configureListenerContainer(c -> c.sessionTransacted(true))
-      .destination(ORDER_QUEUE)
-      .jmsMessageConverter(jmsMessageConverter).get())
+    return IntegrationFlows
+      .from(Jms.messageDrivenChannelAdapter(connectionFactory)
+        .configureListenerContainer(c -> c.sessionTransacted(true))
+        .destination(ORDER_QUEUE)
+        .jmsMessageConverter(jmsMessageConverter).get())
       .channel(messageChannel)
       .get();
   }
