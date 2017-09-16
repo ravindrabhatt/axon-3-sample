@@ -12,7 +12,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.GenericMessage;
 
 @Configuration
-public class MessagingConfiguration {
+public class CommandMessagingConfiguration {
 
   private static final String DEFAULT_BROKER_URL = "tcp://localhost:61616";
 

@@ -1,10 +1,10 @@
 package org.kun.query.listener;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.kun.domain.event.MessageCreatedEvent;
 import org.kun.model.MessageView;
 import org.kun.repository.MessageRepository;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
