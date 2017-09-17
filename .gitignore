@@ -1,6 +1,5 @@
 */*.iml
 *.iml
 .idea
-.idea/*
 target
-opppur
+logs/

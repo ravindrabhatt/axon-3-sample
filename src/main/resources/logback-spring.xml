@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
     <include resource="org/springframework/boot/logging/logback/defaults.xml" />
-    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}/}.log}"/>
+    <property name="LOG_FILE" value="logs/${LOG_FILE}}"/>
     <include resource="org/springframework/boot/logging/logback/file-appender.xml" />
     <root level="INFO">
         <appender-ref ref="FILE" />
