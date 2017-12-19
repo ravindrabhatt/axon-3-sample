@@ -30,7 +30,6 @@ import static org.springframework.kafka.listener.adapter.AbstractRetryingMessage
 @Configuration
 public class QueryMessagingConfiguration {
   private static final String QUERY_CHANNEL = "query_channel";
-  private static final String ORDER_QUEUE = "order-queue";
 
   @Bean
   public IntegrationFlow integrationFlow(@Qualifier(value = QUERY_CHANNEL) MessageChannel messageChannel,
@@ -66,7 +65,7 @@ public class QueryMessagingConfiguration {
     ContainerProperties containerProperties = new ContainerProperties(new TopicPartitionInitialOffset(topic, 0));
     containerProperties.setAckMode(AbstractMessageListenerContainer.AckMode.MANUAL);
 
-    return new KafkaMessageListenerContainer<String, Object>(kafkaConsumerFactory, containerProperties);
+    return new KafkaMessageListenerContainer<>(kafkaConsumerFactory, containerProperties);
   }
 
   @Bean

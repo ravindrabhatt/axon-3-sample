@@ -23,32 +23,11 @@ import java.util.Map;
 @Configuration
 public class CommandMessagingConfiguration {
 
-  private static final String DEFAULT_BROKER_URL = "tcp://localhost:61616";
-
-  private static final String ORDER_QUEUE = "order-queue";
-
-  @Bean
-  public ActiveMQConnectionFactory connectionFactory() {
-    ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
-    connectionFactory.setBrokerURL(DEFAULT_BROKER_URL);
-    return connectionFactory;
-  }
-
-  @Bean
-  public JmsTemplate jmsTemplate(JmsMessageConverter jmsMessageConverter) {
-    JmsTemplate template = new JmsTemplate();
-    template.setConnectionFactory(connectionFactory());
-    template.setMessageConverter(jmsMessageConverter);
-    template.setDefaultDestinationName(ORDER_QUEUE);
-    return template;
-  }
-
   @Bean
   public KafkaTemplate kafkaTemplate(ProducerFactory<String, GenericMessage> producerFactory,
-                                     @Value("${kafka.topic}") String topic,
-                                     @Value("${kafka.server}") String kafkaServer) {
+                                     @Value("${kafka.topic}") String topic) {
 
-    KafkaTemplate<String, GenericMessage> kafkaTemplate = new KafkaTemplate<String, GenericMessage>(producerFactory);
+    KafkaTemplate<String, GenericMessage> kafkaTemplate = new KafkaTemplate<>(producerFactory);
     kafkaTemplate.setMessageConverter(new CustomMessageConverter());
     kafkaTemplate.setDefaultTopic(topic);
     return kafkaTemplate;
@@ -57,7 +36,7 @@ public class CommandMessagingConfiguration {
   @Bean
   public ProducerFactory<String, GenericMessage> producerFactory(ObjectMapper objectMapper,
                                                                  @Value("${kafka.server}") String kafkaServer) {
-    Map<String, Object> props = new HashMap<String, Object>();
+    Map<String, Object> props = new HashMap<>();
     props.put("bootstrap.servers", kafkaServer);
     props.put("acks", "all");
     props.put("retries", 0);
@@ -68,7 +47,7 @@ public class CommandMessagingConfiguration {
     props.put("max.in.flight.requests.per.connection", 1);
     props.put("client.id", "command");
 
-    DefaultKafkaProducerFactory<String, GenericMessage> producerFactory = new DefaultKafkaProducerFactory<String, GenericMessage>(props);
+    DefaultKafkaProducerFactory<String, GenericMessage> producerFactory = new DefaultKafkaProducerFactory<>(props);
     producerFactory.setValueSerializer(new JsonSerializer<>(objectMapper));
     return producerFactory;
   }
