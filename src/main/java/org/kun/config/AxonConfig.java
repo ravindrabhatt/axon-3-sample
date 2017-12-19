@@ -20,9 +20,7 @@ import org.axonframework.mongo.eventsourcing.eventstore.documentperevent.Documen
 import org.axonframework.serialization.json.JacksonSerializer;
 import org.axonframework.spring.config.CommandHandlerSubscriber;
 import org.kun.domain.Message;
-import org.kun.query.listener.MessageCreatedEventListener;
 import org.kun.repository.MessageRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +31,6 @@ import static java.util.Collections.singletonList;
 @Configuration
 @PropertySource("classpath:application.properties")
 public class AxonConfig {
-  @Autowired
-  MessageCreatedEventListener messageCreatedEventListener;
   @Value("${mongo.host.name}")
   private String mongoHost;
   @Value("${mongo.host.port}")
