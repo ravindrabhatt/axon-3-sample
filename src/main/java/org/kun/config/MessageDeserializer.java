@@ -3,9 +3,9 @@ package org.kun.config;
 
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-public class CustomDeserializer extends JsonDeserializer<String> {
+public class MessageDeserializer extends JsonDeserializer<String> {
 
-  public CustomDeserializer() {
+  public MessageDeserializer() {
   }
 
   @Override

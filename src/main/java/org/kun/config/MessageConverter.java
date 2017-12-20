@@ -17,15 +17,15 @@ import org.springframework.messaging.support.MessageBuilder;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-public class CustomMessageConverter extends MessagingMessageConverter {
+public class MessageConverter extends MessagingMessageConverter {
 
   private ObjectMapper objectMapper;
 
-  public CustomMessageConverter(ObjectMapper objectMapper) {
+  public MessageConverter(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
   }
 
-  public CustomMessageConverter() {
+  public MessageConverter() {
   }
 
   @Override

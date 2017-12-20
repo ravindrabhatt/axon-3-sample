@@ -55,7 +55,7 @@ public class QueryMessagingConfiguration {
           return null;
         }
       })
-      .messageConverter(new CustomMessageConverter(objectMapper))
+      .messageConverter(new MessageConverter(objectMapper))
       .get();
   }
 
@@ -76,7 +76,7 @@ public class QueryMessagingConfiguration {
     props.put("bootstrap.servers", kafkaServer);
     props.put("group.id", topic);
     props.put("enable.auto.commit", false);
-    return new DefaultKafkaConsumerFactory<String, String>(props, new StringDeserializer(), new CustomDeserializer());
+    return new DefaultKafkaConsumerFactory<String, String>(props, new StringDeserializer(), new MessageDeserializer());
   }
 
   @Bean(name = QUERY_CHANNEL)

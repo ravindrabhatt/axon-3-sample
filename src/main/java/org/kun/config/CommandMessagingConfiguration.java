@@ -26,7 +26,7 @@ public class CommandMessagingConfiguration {
                                      @Value("${kafka.topic}") String topic) {
 
     KafkaTemplate<String, GenericMessage> kafkaTemplate = new KafkaTemplate<>(producerFactory);
-    kafkaTemplate.setMessageConverter(new CustomMessageConverter());
+    kafkaTemplate.setMessageConverter(new MessageConverter());
     kafkaTemplate.setDefaultTopic(topic);
     return kafkaTemplate;
   }
