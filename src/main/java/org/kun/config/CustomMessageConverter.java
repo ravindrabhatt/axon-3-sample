@@ -54,9 +54,10 @@ public class CustomMessageConverter extends MessagingMessageConverter {
   }
 
   protected Object extractAndConvertValue(ConsumerRecord<?, ?> record, Type type) {
-    JsonNode jsonNode = (JsonNode) record.value();
     Object result = null;
+
     try {
+      JsonNode jsonNode = objectMapper.readTree(record.value().toString());
       result = record.value() == null ? KafkaNull.INSTANCE : objectMapper.readValue(getPayload(jsonNode), getPayloadType(jsonNode));
     } catch (Exception e) {
       e.printStackTrace();

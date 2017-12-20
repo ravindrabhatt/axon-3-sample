@@ -42,7 +42,7 @@ public class QueryMessagingConfiguration {
 
 
   @Bean("kafkaMessageAdapter")
-  public MessageProducerSupport kafkaMessageAdapter(KafkaMessageListenerContainer<String, Object> listenerContainer,
+  public MessageProducerSupport kafkaMessageAdapter(KafkaMessageListenerContainer<String, String> listenerContainer,
                                                     ObjectMapper objectMapper) {
     return Kafka
       .messageDrivenChannelAdapter(listenerContainer)
@@ -60,8 +60,8 @@ public class QueryMessagingConfiguration {
   }
 
   @Bean
-  public KafkaMessageListenerContainer<String, Object> listenerContainer(@Value("${kafka.topic}") String topic,
-                                                                          ConsumerFactory<String, Object> kafkaConsumerFactory) {
+  public KafkaMessageListenerContainer<String, String> listenerContainer(@Value("${kafka.topic}") String topic,
+                                                                         ConsumerFactory<String, String> kafkaConsumerFactory) {
     ContainerProperties containerProperties = new ContainerProperties(new TopicPartitionInitialOffset(topic, 0));
     containerProperties.setAckMode(AbstractMessageListenerContainer.AckMode.MANUAL);
 
@@ -69,14 +69,14 @@ public class QueryMessagingConfiguration {
   }
 
   @Bean
-  public ConsumerFactory<String, Object> kafkaConsumerFactory(@Value("${kafka.topic}") String topic,
+  public ConsumerFactory<String, String> kafkaConsumerFactory(@Value("${kafka.topic}") String topic,
                                                               @Value("${kafka.server}") String kafkaServer,
                                                               ObjectMapper objectMapper) {
     HashMap<String, Object> props = new HashMap<>();
     props.put("bootstrap.servers", kafkaServer);
     props.put("group.id", topic);
     props.put("enable.auto.commit", false);
-    return new DefaultKafkaConsumerFactory<String, Object>(props, new StringDeserializer(), new CustomDeserializer(objectMapper));
+    return new DefaultKafkaConsumerFactory<String, String>(props, new StringDeserializer(), new CustomDeserializer());
   }
 
   @Bean(name = QUERY_CHANNEL)

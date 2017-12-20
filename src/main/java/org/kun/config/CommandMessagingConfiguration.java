@@ -1,14 +1,12 @@
 package org.kun.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.axonframework.eventhandling.EventMessage;
 import org.axonframework.eventsourcing.eventstore.EventStore;
 import org.axonframework.spring.messaging.OutboundEventMessageChannelAdapter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;

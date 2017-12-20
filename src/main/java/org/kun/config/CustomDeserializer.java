@@ -1,23 +1,19 @@
 package org.kun.config;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-public class CustomDeserializer extends JsonDeserializer {
+public class CustomDeserializer extends JsonDeserializer<String> {
 
-  public CustomDeserializer(ObjectMapper objectMapper) {
-    super(Object.class, objectMapper);
+  public CustomDeserializer() {
   }
 
   @Override
-  public Object deserialize(String topic, byte[] data) {
+  public String deserialize(String topic, byte[] data) {
     try {
-      return objectMapper.readTree(data);
+      return new String(data);
     } catch (Exception e) {
       throw new RuntimeException("Failed to deserialize payload");
     }
   }
-
-
 }
