@@ -8,17 +8,20 @@ import org.kun.repository.MessageRepository;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.kafka.support.Acknowledgment;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MessageCreatedEventListenerTest {
 
+  @Mock
+  Acknowledgment acknowledgment;
   @Mock
   private MessageRepository messages;
 
   @Test
   public void shouldSaveData() throws Exception {
     MessageCreatedEventListener listener = new MessageCreatedEventListener(messages);
-    listener.handle(new MessageCreatedEvent("id", "data"));
+    listener.handle(new MessageCreatedEvent("id", "data"), acknowledgment);
 
     Mockito.verify(messages).save(new MessageView("id", "data"));
 

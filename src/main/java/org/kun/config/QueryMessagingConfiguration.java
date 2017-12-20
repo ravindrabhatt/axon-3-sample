@@ -64,19 +64,17 @@ public class QueryMessagingConfiguration {
                                                                          ConsumerFactory<String, String> kafkaConsumerFactory) {
     ContainerProperties containerProperties = new ContainerProperties(new TopicPartitionInitialOffset(topic, 0));
     containerProperties.setAckMode(AbstractMessageListenerContainer.AckMode.MANUAL);
-
     return new KafkaMessageListenerContainer<>(kafkaConsumerFactory, containerProperties);
   }
 
   @Bean
   public ConsumerFactory<String, String> kafkaConsumerFactory(@Value("${kafka.topic}") String topic,
-                                                              @Value("${kafka.server}") String kafkaServer,
-                                                              ObjectMapper objectMapper) {
+                                                              @Value("${kafka.server}") String kafkaServer) {
     HashMap<String, Object> props = new HashMap<>();
     props.put("bootstrap.servers", kafkaServer);
     props.put("group.id", topic);
     props.put("enable.auto.commit", false);
-    return new DefaultKafkaConsumerFactory<String, String>(props, new StringDeserializer(), new MessageDeserializer());
+    return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new MessageDeserializer());
   }
 
   @Bean(name = QUERY_CHANNEL)
