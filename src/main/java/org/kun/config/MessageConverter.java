@@ -66,10 +66,10 @@ public class MessageConverter extends MessagingMessageConverter {
   }
 
   private Class<?> getPayloadType(JsonNode jsonNode) throws ClassNotFoundException {
-    return Class.forName(jsonNode.get("payloadType").textValue());
+    return Class.forName(jsonNode.get("payload").get("payloadType").textValue());
   }
 
   private String getPayload(JsonNode jsonNode) throws JsonProcessingException {
-    return objectMapper.writeValueAsString(jsonNode.get("payload"));
+    return objectMapper.writeValueAsString(jsonNode.get("payload").get("payload"));
   }
 }

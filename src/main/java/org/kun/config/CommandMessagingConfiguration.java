@@ -66,8 +66,8 @@ public class CommandMessagingConfiguration {
       }
     }) {
       @Override
-      protected Message<?> transform(EventMessage<?> event) {
-        return new KafkaMessage(event.getIdentifier(), event.getPayload(), event.getMetaData(), event.getPayloadType());
+      protected Message<?> transform(EventMessage <?> event) {
+        return new GenericMessage<Object>(event);
       }
     };
   }
