@@ -74,7 +74,7 @@ public class QueryMessagingConfiguration {
     props.put("bootstrap.servers", kafkaServer);
     props.put("group.id", topic);
     props.put("enable.auto.commit", false);
-    return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new MessageDeserializer());
+    return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new StringDeserializer());
   }
 
   @Bean(name = QUERY_CHANNEL)
